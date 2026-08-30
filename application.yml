@@ -1,0 +1,4 @@
+server:
+  port: 8080
+mcp:
+  base-dir: ${MCP_BASE_DIR:/tmp/mcp-sandbox}
