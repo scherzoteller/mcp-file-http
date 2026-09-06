@@ -45,3 +45,5 @@ node_modules
 
 tmp/
 .idea/
+logs/
+data/sandbox/*

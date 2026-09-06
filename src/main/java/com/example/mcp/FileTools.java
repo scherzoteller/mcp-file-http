@@ -1,5 +1,6 @@
 package com.example.mcp;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.mcp.annotation.McpTool;
@@ -12,9 +13,8 @@ import org.springframework.stereotype.Component;
  * by local models to read and write files in the sandbox directory.
  */
 @Component
+@Slf4j
 public class FileTools {
-
-    private static final Logger log = LoggerFactory.getLogger(FileTools.class);
 
     private final FileOperationService fileService;
 

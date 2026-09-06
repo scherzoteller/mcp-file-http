@@ -1,5 +1,6 @@
 package com.example.mcp;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,8 @@ import java.nio.file.Paths;
  * This is called directly by the MCP controller (not invoked via LLM chat).
  */
 @Service
+@Slf4j
 public class FileOperationService {
-
-    private static final Logger log = LoggerFactory.getLogger(FileOperationService.class);
 
     private final Path basePath;
 
