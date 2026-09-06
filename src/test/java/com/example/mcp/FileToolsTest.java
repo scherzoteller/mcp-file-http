@@ -1,5 +1,9 @@
 package com.example.mcp;
 
+import com.example.mcp.application.file.services.FileOperationAppService;
+import com.example.mcp.domain.file.ports.FilePort;
+import com.example.mcp.exposition.file.mcp.FileMcpTools;
+import com.example.mcp.infrastructure.file.adapter.FileSystemFileAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -17,22 +21,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Unit tests for FileTools using real FileOperationService with temp directories.
- * Note: We avoid Mockito for FileOperationService because Java 25's strong encapsulation
- * prevents Mockito from creating inline mocks of concrete classes.
+ * Unit tests for FileMcpTools using real FileSystemFileAdapter with temp directories.
  */
 class FileToolsTest {
 
-    private FileTools fileTools;
+    private FileMcpTools fileMcpTools;
 
     @TempDir
     Path tempDir;
 
     @BeforeEach
     void setUp() throws Exception {
-        // Create a FileOperationService with our temp directory
-        FileOperationService fileOperationService = new FileOperationService(tempDir);
-        fileTools = new FileTools(fileOperationService);
+        // Create a FileSystemFileAdapter with our temp directory
+        FilePort filePort = new FileSystemFileAdapter(tempDir);
+        FileOperationAppService fileAppService = new FileOperationAppService(filePort);
+        fileMcpTools = new FileMcpTools(fileAppService);
     }
 
     @Test
@@ -42,7 +45,7 @@ class FileToolsTest {
         Files.writeString(testFile, "File content here");
 
         // When
-        String result = fileTools.readFile("test.txt");
+        String result = fileMcpTools.readFile("test.txt");
 
         // Then
         assertThat(result).isEqualTo("File content here");
@@ -57,7 +60,7 @@ class FileToolsTest {
         Files.writeString(targetPath, "Content for " + path);
 
         // When
-        String result = fileTools.readFile(path);
+        String result = fileMcpTools.readFile(path);
 
         // Then
         assertThat(result).isEqualTo("Content for " + path);
@@ -66,7 +69,7 @@ class FileToolsTest {
     @Test
     void readFile_shouldHandleServiceException() {
         // When & Then - reading non-existent file should throw
-        assertThatThrownBy(() -> fileTools.readFile("nonexistent.txt"))
+        assertThatThrownBy(() -> fileMcpTools.readFile("nonexistent.txt"))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("Failed to read file");
     }
@@ -74,7 +77,7 @@ class FileToolsTest {
     @Test
     void writeFile_shouldDelegateToServiceAndReturnConfirmation() throws IOException {
         // When
-        String result = fileTools.writeFile("test.txt", "Content to write");
+        String result = fileMcpTools.writeFile("test.txt", "Content to write");
 
         // Then
         assertThat(result).isEqualTo("File written successfully: test.txt");
@@ -86,7 +89,7 @@ class FileToolsTest {
     @ValueSource(strings = {"newfile.txt", "existing.txt", "dir/newfile.txt"})
     void writeFile_shouldCorrectlyDelegateVariousPaths(String path) throws IOException {
         // When
-        String result = fileTools.writeFile(path, "Content");
+        String result = fileMcpTools.writeFile(path, "Content");
 
         // Then
         assertThat(result).startsWith("File written successfully:");
@@ -98,7 +101,7 @@ class FileToolsTest {
     @Test
     void writeFile_shouldHandleNullContent() throws IOException {
         // When
-        String result = fileTools.writeFile("null.txt", null);
+        String result = fileMcpTools.writeFile("null.txt", null);
 
         // Then
         assertThat(result).isEqualTo("File written successfully: null.txt");
@@ -110,7 +113,7 @@ class FileToolsTest {
     @Test
     void writeFile_shouldHandleServiceException() {
         // When & Then - path traversal should be rejected
-        assertThatThrownBy(() -> fileTools.writeFile("../../etc/passwd", "content"))
+        assertThatThrownBy(() -> fileMcpTools.writeFile("../../etc/passwd", "content"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Access denied");
     }
@@ -118,7 +121,7 @@ class FileToolsTest {
     @Test
     void listTools_shouldReturnToolDescriptions() {
         // When
-        String result = fileTools.listTools();
+        String result = fileMcpTools.listTools();
 
         // Then
         assertThat(result)
@@ -132,7 +135,7 @@ class FileToolsTest {
     @Test
     void listTools_shouldNotThrowException() {
         // When
-        String result = fileTools.listTools();
+        String result = fileMcpTools.listTools();
 
         // Then
         assertThat(result).isNotNull();
@@ -155,15 +158,15 @@ class FileToolsTest {
     @MethodSource("roundTripProvider")
     void writeFile_and_readFile_shouldWorkTogether(String filename, String content) throws IOException {
         // When
-        fileTools.writeFile(filename, content);
-        String result = fileTools.readFile(filename);
+        fileMcpTools.writeFile(filename, content);
+        String result = fileMcpTools.readFile(filename);
 
         // Then
         assertThat(result).isEqualTo(content);
     }
 
     @Test
-    void fileTools_shouldHandleLongContent() throws IOException {
+    void fileMcpTools_shouldHandleLongContent() throws IOException {
         // Given
         StringBuilder longContent = new StringBuilder();
         for (int i = 0; i < 1000; i++) {
@@ -171,21 +174,21 @@ class FileToolsTest {
         }
 
         // When
-        fileTools.writeFile("long.txt", longContent.toString());
-        String result = fileTools.readFile("long.txt");
+        fileMcpTools.writeFile("long.txt", longContent.toString());
+        String result = fileMcpTools.readFile("long.txt");
 
         // Then
         assertThat(result).isEqualTo(longContent.toString());
     }
 
     @Test
-    void fileTools_shouldHandleEmptyFilenameComponents() throws IOException {
+    void fileMcpTools_shouldHandleEmptyFilenameComponents() throws IOException {
         // Given
         Path testFile = tempDir.resolve("empty.txt");
         Files.writeString(testFile, "");
 
         // When
-        String result = fileTools.readFile("empty.txt");
+        String result = fileMcpTools.readFile("empty.txt");
 
         // Then
         assertThat(result).isEmpty();

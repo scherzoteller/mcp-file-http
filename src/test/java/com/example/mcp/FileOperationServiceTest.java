@@ -1,5 +1,6 @@
 package com.example.mcp;
 
+import com.example.mcp.domain.file.services.FileOperationDomainService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -15,9 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Unit tests for FileOperationService.
+ * Unit tests for FileOperationDomainService.
  */
-class FileOperationServiceTest {
+class FileOperationDomainServiceTest {
 
     @Test
     void readFile_shouldReadContentFromExistingFile() throws IOException {
@@ -27,7 +28,7 @@ class FileOperationServiceTest {
         Files.writeString(testFile, "Hello, World!");
 
         // Create a custom service with our test directory
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         String content = service.readFile("test.txt");
@@ -45,7 +46,7 @@ class FileOperationServiceTest {
         Files.createDirectories(targetPath.getParent());
         Files.writeString(targetPath, "Content of " + path);
 
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         String content = service.readFile(path);
@@ -61,7 +62,7 @@ class FileOperationServiceTest {
         Path testFile = sandboxDir.resolve("empty.txt");
         Files.writeString(testFile, "");
 
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         String content = service.readFile("empty.txt");
@@ -75,7 +76,7 @@ class FileOperationServiceTest {
     void readFile_shouldRejectPathTraversalAttempts(String maliciousPath) throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When & Then
         assertThatThrownBy(() -> service.readFile(maliciousPath))
@@ -87,7 +88,7 @@ class FileOperationServiceTest {
     void readFile_shouldThrowExceptionForNonExistentFile() throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When & Then
         assertThatThrownBy(() -> service.readFile("nonexistent.txt"))
@@ -99,7 +100,7 @@ class FileOperationServiceTest {
     void writeFile_shouldCreateNewFile() throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         service.writeFile("newfile.txt", "New content");
@@ -116,7 +117,7 @@ class FileOperationServiceTest {
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
         Path testFile = sandboxDir.resolve("existing.txt");
         Files.writeString(testFile, "Old content");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         service.writeFile("existing.txt", "New content");
@@ -129,7 +130,7 @@ class FileOperationServiceTest {
     void writeFile_shouldCreateSubdirectories() throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         service.writeFile("a/b/c/deep.txt", "Deep content");
@@ -145,7 +146,7 @@ class FileOperationServiceTest {
     void writeFile_shouldRejectPathTraversalAttempts(String maliciousPath) throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When & Then
         assertThatThrownBy(() -> service.writeFile(maliciousPath, "content"))
@@ -157,12 +158,12 @@ class FileOperationServiceTest {
     void writeFile_shouldHandleNullContent() throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         service.writeFile("nullcontent.txt", null);
 
-        // Then - null content should write an empty file
+        // Then
         Path filePath = sandboxDir.resolve("nullcontent.txt");
         assertThat(Files.exists(filePath)).isTrue();
     }
@@ -171,7 +172,7 @@ class FileOperationServiceTest {
     void writeFile_shouldHandleUnicodeContent() throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
         String unicodeContent = "你好，世界！🌍 Привет мир!";
 
         // When
@@ -186,7 +187,7 @@ class FileOperationServiceTest {
     void getBasePath_shouldReturnBaseDirectory() throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         Path basePath = service.getBasePath();
@@ -213,7 +214,7 @@ class FileOperationServiceTest {
     void writeFile_and_readFile_shouldBeConsistent(String testName, String content) throws IOException {
         // Given
         Path sandboxDir = Files.createTempDirectory("sandbox-test");
-        FileOperationService service = new FileOperationService(sandboxDir);
+        FileOperationDomainService service = new FileOperationDomainService(sandboxDir);
 
         // When
         service.writeFile(testName + ".txt", content);
