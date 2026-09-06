@@ -1,4 +1,33 @@
 server:
   port: 8080
+
 mcp:
-  base-dir: ${MCP_BASE_DIR:/tmp/mcp-sandbox}
+  base-dir: ${MCP_BASE_DIR:/Users/scherzoteller/projects/java/mcp-file-http/data/sandbox}
+
+logging:
+  level:
+    root: INFO
+    com.example.mcp: DEBUG
+    org.springframework: DEBUG
+    org.springframework.ai.mcp: DEBUG
+    org.springframework.boot.autoconfigure: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/mcp-file-http.log
+
+
+
+#spring:
+#  ai:
+#    mcp:
+#      server:
+#        transport: webmvc
+spring:
+  ai:
+    mcp:
+      server:
+        protocol: STATELESS
+        mcp-endpoint: /mcp
+        name: mcp-file
+        version: 1.0.0
