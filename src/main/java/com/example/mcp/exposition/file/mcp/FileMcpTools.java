@@ -13,6 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileMcpTools {
 
+    public static final String LIST_TOOLS_RESULT = """
+            Available tools:
+            1. read_file(path) - Read the content of a text file from the sandbox directory.
+            2. write_file(path, content) - Write content to a text file in the sandbox directory.
+            """;
     private final FileOperationAppService fileAppService;
 
     /**
@@ -62,8 +67,6 @@ public class FileMcpTools {
         description = "Get a list of available tools and their descriptions."
     )
     public String listTools() {
-        return "Available tools:\n" +
-                "1. read_file(path) - Read the content of a text file from the sandbox directory.\n" +
-                "2. write_file(path, content) - Write content to a text file in the sandbox directory.";
+        return LIST_TOOLS_RESULT;
     }
 }

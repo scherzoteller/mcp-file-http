@@ -1,4 +1,4 @@
-package com.example.mcp;
+package com.example.mcp.archi;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
