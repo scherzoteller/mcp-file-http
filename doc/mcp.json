@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "web-search": {
+      "command": "node",
+      "args": [
+        "/Users/scherzoteller/mcp-servers/web-search-mcp/dist/index.js"
+      ]
+    },
+    "file-access": {
+      "url": "http://localhost:8080/mcp",
+      "headers": {
+        "Authorization": "Bearer 1234"
+      }
+    }
+  }
+}
+
