@@ -2,6 +2,8 @@ package com.example.mcp.application.file.services;
 
 import com.example.mcp.domain.file.ports.FilePort;
 
+import java.util.List;
+
 /**
  * Application service for file operations.
  * Combines different parts of the domain layer to provide application-level functionality.
@@ -37,5 +39,9 @@ public class FileOperationAppService {
      */
     public void writeFile(String path, String content) {
         filePort.writeFile(path, content);
+    }
+
+    public List<String> listFilesAndDirs(String path, boolean recurse){
+        return filePort.listFilesAndDirs(path, recurse);
     }
 }

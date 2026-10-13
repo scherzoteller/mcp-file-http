@@ -47,3 +47,6 @@ tmp/
 .idea/
 logs/
 data/sandbox/*
+
+output.txt
+

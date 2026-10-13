@@ -1,5 +1,7 @@
 package com.example.mcp.domain.file.ports;
 
+import java.util.List;
+
 /**
  * Port for file operations.
  * This interface defines the contract for file reading and writing operations.
@@ -15,6 +17,8 @@ public interface FilePort {
      * @throws IllegalStateException if the file cannot be read
      */
     String readFile(String path);
+
+    List<String> listFilesAndDirs(String path, boolean recurse);
 
     /**
      * Writes content to a file.

@@ -2,12 +2,16 @@ package com.example.mcp.infrastructure.file.adapter;
 
 import com.example.mcp.domain.file.ports.FilePort;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Infrastructure adapter implementing FilePort for file system operations.
@@ -42,6 +46,26 @@ public class FileSystemFileAdapter implements FilePort {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read file: " + path, e);
         }
+    }
+
+    @Override
+    public List<String> listFilesAndDirs(String path, boolean recurse){
+        Path filePath = resolveAndValidatePath(path);
+        File[] files = Objects.requireNonNull(filePath.toFile().listFiles());
+        return Arrays.stream(files).flatMap(f -> {
+            boolean simpleFile = !f.isDirectory() || !recurse;
+            String simpleFileName = path + (path.endsWith("/") ? "" : "/")+ f.getName();
+            if(simpleFile){
+                return Stream.of(simpleFileName);
+            }else{
+                return Stream.concat(
+                        Stream.of(simpleFileName),
+                        listFilesAndDirs(simpleFileName, recurse).stream()
+                );
+            }
+            //return path + f.getName();
+        }).toList();
+
     }
 
     @Override

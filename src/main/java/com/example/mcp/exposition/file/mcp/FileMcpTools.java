@@ -5,6 +5,8 @@ import org.springframework.ai.mcp.annotation.McpTool;
 import org.springframework.ai.mcp.annotation.McpToolParam;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * MCP tools for file operations.
  * This class is part of the exposition layer and provides MCP tools
@@ -57,6 +59,21 @@ public class FileMcpTools {
     public String writeFile(@McpToolParam(description = "relative path of file") String path, @McpToolParam(description = "file content") String content) {
         fileAppService.writeFile(path, content);
         return "File written successfully: " + path;
+    }
+
+    /**
+     * List the content of directory (recursion is possible)
+     *
+     * @param path the relative path to list (should be a directory, but will work with simple file)
+     * @return A list of file path (still relative but same origin as supplied path
+     */
+    @McpTool(
+            name = "list_files",
+            description = "List the content of directory (recursion is possible). The path must be relative to the base sandbox directory and result will have the same reference."
+    )
+    public List<String> listFilesAndDirs(@McpToolParam(description = "Relative path of file") String path,
+                                         @McpToolParam(description = "Recursive listing") boolean recurse){
+        return fileAppService.listFilesAndDirs(path, recurse);
     }
 
     /**
